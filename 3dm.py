@@ -12,7 +12,7 @@ from include.twitter import MyTwitter
 
 import configparser
 config = configparser.ConfigParser()
-config.read('3dm.cfg')
+config.read('config.cfg')
 
 DEBUG  = True
 PREFIX = "!3DM"
@@ -36,7 +36,8 @@ WELCOME_MESSAGE = "https://discordapp.com/channels/637075986726518794/6370762258
 
 t = MyTwitter()
 
-client = discord.Client()
+#client = discord.Client()
+bot = discord.ext.commands.Bot(command_prefix='!')
 
 # fix some different way to type currency
 class cc_arg():
@@ -91,9 +92,9 @@ async def checkImgPost(msg):
                         pass
                     out_emb.set_footer(text="!tweet {0}".format(msg.id))
 
-                    cross_post = client.get_channel(TRACKING_IMG)
+                    cross_post = bot.get_channel(TRACKING_IMG)
                     info = await cross_post.send(embed=out_emb)
-                    emoji_delete   = discord.utils.get(client.emojis, name='dead_cat')
+                    emoji_delete   = discord.utils.get(bot.emojis, name='dead_cat')
                     await info.add_reaction(emoji_delete)
                     t.tdb.add_image_log(msg.id, msg.channel.id, info.id, info.channel.id)
 
@@ -108,25 +109,25 @@ async def noob(msg):
 
     return True
 
-@client.event
+@bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print('We have logged in as {0.user}'.format(bot))
 
-@client.event
+@bot.event
 async def on_raw_reaction_add(payload):
-    if payload.user_id == client.user.id:
+    if payload.user_id == bot.user.id:
         return
 
     # monitor the image log channel, if someone hit a reaction, remove it from channel
     if payload.channel_id in [TRACKING_IMG, JOIN_CHANNEL] and payload.emoji.name in ["dead_cat", "corona"]:
         t.tdb.del_image_log(payload.message_id, payload.channel_id)
-        cross_post = client.get_channel(payload.channel_id)
+        cross_post = bot.get_channel(payload.channel_id)
         image_post = await cross_post.fetch_message(payload.message_id)
         await image_post.delete()
         
-@client.event
+@bot.event
 async def on_message(msg):
-    if msg.author == client.user:
+    if msg.author == bot.user:
         return
 
     msg_content = msg.content.upper()
@@ -169,8 +170,8 @@ async def on_message(msg):
                 allowed = eval(config['twitter']['allowed_roles'])
                 # Check if user is allowed to use this command
                 if any( True for x in allowed if x in roles ) or sub_msg.startswith("TOP") or sub_msg.startswith("LINK") or sub_msg.startswith("UNLINK") or sub_msg.startswith("SHOW"):
-                    emoji_twitter   = discord.utils.get(client.emojis, name='twitter')
-                    emoji_3dm       = discord.utils.get(client.emojis, name='3dm2')
+                    emoji_twitter   = discord.utils.get(bot.emojis, name='twitter')
+                    emoji_3dm       = discord.utils.get(bot.emojis, name='3dm2')
                     delete_post     = True
                     if sub_msg.startswith("LIST"):
                         out_msg += "DB contain {0} entry. Displaying lastest 5.".format(t.count())
@@ -182,11 +183,11 @@ async def on_message(msg):
                         id = re.search('^ *(\d+)', msg.content[14:]).group(1)
                         track = t.delete(id)
                         try:
-                            mm = await client.get_channel(TRACKING_TWEETS).fetch_message(track)
+                            mm = await bot.get_channel(TRACKING_TWEETS).fetch_message(track)
                             await mm.delete()
                             mm = await msg.channel.fetch_message(id)
-                            await mm.remove_reaction(emoji_3dm, client.user)
-                            await mm.remove_reaction(emoji_twitter, client.user)
+                            await mm.remove_reaction(emoji_3dm, bot.user)
+                            await mm.remove_reaction(emoji_twitter, bot.user)
                         except:
                             pass
 
@@ -267,7 +268,7 @@ async def on_message(msg):
                                     if tweet_added:
                                         await post_msg.add_reaction(emoji_3dm)
                                         await post_msg.add_reaction(emoji_twitter)
-                                        cross_post = client.get_channel(TRACKING_TWEETS)
+                                        cross_post = bot.get_channel(TRACKING_TWEETS)
                                         post_link = 'https://discordapp.com/channels/637075986726518794/{0}/{1}'.format( msg.channel.id, post_msg.id )
                                         out_emb = discord.Embed(title="New tweet queued from: {0}".format(post_msg.author.display_name), 
                                                                             description="Sent in <#{0}> - _[original post]({2})_\n\n>>> `{1}`".format(msg.channel.id, gs[2].replace('`', ''), post_link), color=0xffffff)
@@ -286,7 +287,7 @@ async def on_message(msg):
                                         # check if the images was posted in log if so, delete it
                                         image_log = t.tdb.get_image_tracking(post_msg.id, msg.channel.id)
                                         if image_log:
-                                            cross_post = client.get_channel(image_log[1])
+                                            cross_post = bot.get_channel(image_log[1])
                                             image_post = await cross_post.fetch_message(image_log[0])
                                             t.tdb.del_image_log(image_post.id, image_post.channel.id)
                                             await image_post.delete()
@@ -391,10 +392,10 @@ async def on_message(msg):
                         output = "No member fixed"
 
                 elif cmd[1] == "test":
-                    # emoji = discord.utils.get(client.emojis, name='twitter')
+                    # emoji = discord.utils.get(bot.emojis, name='twitter')
                     # if emoji:
                     #     await msg.add_reaction(emoji)
-                    # emoji = discord.utils.get(client.emojis, name='3dm2')
+                    # emoji = discord.utils.get(bot.emojis, name='3dm2')
                     # if emoji:
                     #     await msg.add_reaction(emoji)
                     output = "test cmd\nCommand trigger: {0}\nChannel: {1}".format(PREFIX, msg.channel)
@@ -446,7 +447,5 @@ async def on_message(msg):
                 else:
                     await msg.channel.send("no result found for `{0}`".format(search))
 
-client.run(config['discord']['token'])
 
-
-#test
+bot.run(config['discord']['token'])
