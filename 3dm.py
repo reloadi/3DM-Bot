@@ -10,6 +10,9 @@ from include.linux_color import _c as ct
 from include.my_google import Google
 from include.twitter import MyTwitter
 
+#Cogs
+from Cogs.DiceCog import DiceCog
+
 import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
@@ -38,6 +41,7 @@ t = MyTwitter()
 
 #client = discord.Client()
 bot = discord.ext.commands.Bot(command_prefix='!')
+bot.add_cog(DiceCog(bot))
 
 # fix some different way to type currency
 class cc_arg():
