@@ -60,6 +60,7 @@ def __help():
     output.add_field(name="!tweet unlink [user]", value="Remove link between discord account and twitter account", inline=False)
     output.add_field(name="!tweet top", value="Show top twitted members", inline=False)
     output.add_field(name="!tweet [list|delete|ID] [pos] short text (restricted)", value="Post a user's message (ID) to the twitter account.", inline=False)
+    output.add_field(name="!roll [xDn] (xDn...)",value="Where x is the number of dice and n is the number of sides on the dice. Ex: 1D6 2D8", inline=False)
     return output
 
 # used for local debugging
