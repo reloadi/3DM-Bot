@@ -35,6 +35,8 @@ TRACKING_IMG    = int(config['img_log']['tracking_channel'])
 JOIN_CHANNEL    = 689574436302880843
 WELCOME_MESSAGE = "https://discordapp.com/channels/637075986726518794/637076225843527690/637108901720096770"
 
+t = MyTwitter()
+
 client = discord.Client()
 
 class cc_arg():

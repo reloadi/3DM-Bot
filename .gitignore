@@ -7,5 +7,4 @@ tweets.db
 *.pyc
 3dm.cfg
 test/*
-check.py
 disboard.py
