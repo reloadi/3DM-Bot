@@ -1,0 +1,11 @@
+.vscode/*
+__pycache__/*
+include/__pycache__/*
+status.log
+tweets.db
+*.jpg
+*.pyc
+3dm.cfg
+test/*
+check.py
+disboard.py

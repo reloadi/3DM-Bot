@@ -1,0 +1,12 @@
+discord==1.0.1
+CurrencyConverter==0.14
+htmldom==2.0
+discord-webhook==0.7.0
+humanfriendly==4.18
+google-api-python-client==1.7.11
+tweepy==3.8.0
+Pillow==7.0.0
+mysql-connector==2.2.9
+praw==6.5.1
+measurement==3.2.0
+python-dateutil==2.8.1
