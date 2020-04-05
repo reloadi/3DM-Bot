@@ -6,4 +6,5 @@ tweets.db
 *.jpg
 *.pyc
 test/*
+tools/*
 config.cfg
