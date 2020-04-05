@@ -8,3 +8,5 @@ tweets.db
 test/*
 tools/*
 config.cfg
+disboard.py
+
