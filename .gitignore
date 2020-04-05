@@ -6,5 +6,4 @@ tweets.db
 *.jpg
 *.pyc
 test/*
-disboard.py
 config.cfg
