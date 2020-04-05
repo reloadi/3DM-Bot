@@ -1,4 +1,5 @@
 import discord
+from discord.ext.commands import CommandNotFound
 import subprocess
 import signal
 import re
@@ -133,6 +134,13 @@ async def on_raw_reaction_add(payload):
         cross_post = bot.get_channel(payload.channel_id)
         image_post = await cross_post.fetch_message(payload.message_id)
         await image_post.delete()
+
+# Ignore command not found errors and don't print them to the output
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, CommandNotFound):
+        return
+    raise error
         
 @bot.event
 async def on_message(msg):
@@ -455,8 +463,8 @@ async def on_message(msg):
                     await msg.channel.send(embed=output)
                 else:
                     await msg.channel.send("no result found for `{0}`".format(search))
-    
-    await bot.process_commands(msg)
+        else:    
+            await bot.process_commands(msg)
 
 
 bot.run(config['discord']['token'])
