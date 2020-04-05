@@ -73,6 +73,9 @@ class TweetDB():
     def top_twitter(self):
         return self.conn.execute("select addedby, count(*) from tweets group by addedby order by count(*) desc").fetchall()
 
+    def top_clean(self):
+        return self.conn.execute("select author, count from image_log_count order by count desc").fetchall()
+
     def top_author(self, limit=-1):
         return self.conn.execute("select author, count(id), twitter_name from tweets left join twitter_account on tweets.author_id = twitter_account.id_user group by author order by count(id) desc limit ?", (limit,)).fetchall()
 
@@ -118,6 +121,16 @@ class TweetDB():
         self.conn.execute("delete from image_log where tracking_id = ? and tracking_channel = ?", (tracking_id, tracking_channel,))
         self.conn.commit()
 
+    def add_clean(self, id_author, author):
+        count = self.conn.execute("select count from image_log_count where id_author = ?", (id_author,)).fetchone()
+        if count:
+            self.conn.execute("update image_log_count set count = count + 1 where id_author = ?", (id_author,))
+            self.conn.commit()
+        else:
+            self.conn.execute("insert into image_log_count (id_author, author, count) values (?, ?, 1)", (id_author,author, ))
+            self.conn.commit()
+
+
     def get_image_tracking(self, id, channel):
         return self.conn.execute("select tracking_id, tracking_channel from image_log where id = ? and channel = ?", (id,channel,)).fetchone()
 
@@ -126,6 +139,7 @@ class TweetDB():
         self.conn = sqlite3.connect(dbpath)
         self.conn.execute("CREATE TABLE tweets ( id INTEGER, author TEXT NOT NULL, url TEXT NOT NULL, msg TEXT NOT NULL, datetime TEXT NOT NULL, posted INTEGER DEFAULT 0, addedby TEXT NOT NULL DEFAULT '', channel TEXT NOT NULL DEFAULT '' , author_id TEXT NOT NULL DEFAULT '', track_id INTEGER NOT NULL DEFAULT 0);")
         self.conn.execute("CREATE TABLE image_log ( id INTEGER, channel INTEGER, tracking_id INTEGER, tracking_channel INTEGER);")
+        self.conn.execute("CREATE TABLE image_log_count ( id_author INTEGER, author TEXT NOT NULL, count INTEGER);")
         self.conn.commit()
         self.conn.close()
 

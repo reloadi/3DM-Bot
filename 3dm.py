@@ -18,7 +18,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
 
-VERSION= "1.1.3"
+VERSION= "1.1.4"
 DEBUG  = True
 PREFIX = "!3DM"
 GCODE  = "!GCODE"
@@ -134,6 +134,7 @@ async def on_raw_reaction_add(payload):
         cross_post = bot.get_channel(payload.channel_id)
         image_post = await cross_post.fetch_message(payload.message_id)
         await image_post.delete()
+        t.tdb.add_clean(payload.user_id, payload.member.name)
 
 # Ignore command not found errors and don't print them to the output
 @bot.event
@@ -213,6 +214,10 @@ async def on_message(msg):
                         out_msg += "3DMeltdown top 3DM-twitters:\n"
                         for i in t.tdb.top_twitter():
                             out_msg += "**{0}** - {1} post(s)\n".format( (i[0] if i[0] else 'none'), i[1])
+                    elif sub_msg.startswith("TOP_CLEAN"):
+                        out_msg += "3DMeltdown top cleaner:\n"
+                        for i in t.tdb.top_clean():
+                            out_msg += "**{0}** - {1} cleans\n".format( (i[0] if i[0] else 'none'), i[1])
                     elif sub_msg.startswith("TOP"):
                         out_msg += "3DMeltdown top 10 tweeted members: (_<https://twitter.com/3DMeltdown>_)\n"
                         x=1
