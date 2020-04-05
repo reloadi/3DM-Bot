@@ -451,6 +451,8 @@ async def on_message(msg):
                     await msg.channel.send(embed=output)
                 else:
                     await msg.channel.send("no result found for `{0}`".format(search))
+    
+    await bot.process_commands(msg)
 
 
 bot.run(config['discord']['token'])
