@@ -18,7 +18,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
 
-VERSION= "1.1.4"
+VERSION= "1.1.5"
 DEBUG  = True
 PREFIX = "!3DM"
 GCODE  = "!GCODE"
@@ -274,10 +274,10 @@ async def on_message(msg):
                                         tweet_added = True
                                     # check for link
                                     else:
-                                        att = re.search('(http[^ ]+)', post_msg.content)
+                                        att = re.findall('(http[^ \n]+)', post_msg.content)
                                         # link was found
                                         if att:
-                                            post_url = att.groups()[0]
+                                            post_url = att[int(gs[1])-1 if gs[1] else 0]
                                             out_msg += "Tweet from {0} queued. Current position: {1}".format(post_msg.author.display_name, t.count())
                                             tweet_added = True
                                         # no link found
