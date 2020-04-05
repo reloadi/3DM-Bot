@@ -18,7 +18,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
 
-VERSION= "1.1.5"
+VERSION= "1.1.6"
 DEBUG  = True
 PREFIX = "!3DM"
 GCODE  = "!GCODE"
@@ -27,6 +27,7 @@ GCODE  = "!GCODE"
 my_cur = eval(config['currency']['use'])
 
 # used to log tweets added/posted
+DELETE_EMOJI    = "dead_cat"
 TRACKING_TWEETS = int(config['twitter']['tracking_channel'])
 POST_COLOR      = 0xa21d1d
 
@@ -101,7 +102,7 @@ async def checkImgPost(msg):
 
                     cross_post = bot.get_channel(TRACKING_IMG)
                     info = await cross_post.send(embed=out_emb)
-                    emoji_delete   = discord.utils.get(bot.emojis, name='dead_cat')
+                    emoji_delete   = discord.utils.get(bot.emojis, name=DELETE_EMOJI)
                     await info.add_reaction(emoji_delete)
                     t.tdb.add_image_log(msg.id, msg.channel.id, info.id, info.channel.id)
 
@@ -127,14 +128,26 @@ async def on_ready():
 async def on_raw_reaction_add(payload):
     if payload.user_id == bot.user.id:
         return
+    guild   = bot.get_guild(payload.guild_id)
+    member  = guild.get_member(payload.user_id)
 
     # monitor the image log channel, if someone hit a reaction, remove it from channel
-    if payload.channel_id in [TRACKING_IMG, JOIN_CHANNEL] and payload.emoji.name in ["dead_cat", "corona"]:
-        t.tdb.del_image_log(payload.message_id, payload.channel_id)
+    if payload.channel_id in [TRACKING_IMG, JOIN_CHANNEL] and payload.emoji.name in [DELETE_EMOJI]:
         cross_post = bot.get_channel(payload.channel_id)
         image_post = await cross_post.fetch_message(payload.message_id)
-        await image_post.delete()
-        t.tdb.add_clean(payload.user_id, payload.member.name)
+        # check if member is allowed
+        if t.allowed(member.roles):
+            await image_post.delete()
+            t.tdb.del_image_log(payload.message_id, payload.channel_id)
+            t.tdb.add_clean(payload.user_id, payload.member.name)
+        # not allowed, post a message and remove reaction
+        else:
+            emoji_delete   = discord.utils.get(bot.emojis, name=DELETE_EMOJI)
+            await image_post.remove_reaction(emoji_delete, member)
+            out_emb = discord.Embed(title="Not allowed", description="Thanks for your interest <@{0}>!\n\nIf you think you can help cleaning this, talk to a mod!".format(member.id), color=POST_COLOR)
+            id = await cross_post.send(embed=out_emb)
+            await id.delete(delay=8)
+        
 
 # Ignore command not found errors and don't print them to the output
 @bot.event
@@ -184,10 +197,8 @@ async def on_message(msg):
                 out_msg = ""
                 out_emb = False
                 sub_msg = msg.content[7:].upper()
-                roles   = [y.name.lower() for y in msg.author.roles]
-                allowed = eval(config['twitter']['allowed_roles'])
                 # Check if user is allowed to use this command
-                if any( True for x in allowed if x in roles ) or sub_msg.startswith("TOP") or sub_msg.startswith("LINK") or sub_msg.startswith("UNLINK") or sub_msg.startswith("SHOW"):
+                if t.allowed(msg.author.roles) or sub_msg.startswith("TOP") or sub_msg.startswith("LINK") or sub_msg.startswith("UNLINK") or sub_msg.startswith("SHOW"):
                     emoji_twitter   = discord.utils.get(bot.emojis, name='twitter')
                     emoji_3dm       = discord.utils.get(bot.emojis, name='3dm2')
                     delete_post     = True

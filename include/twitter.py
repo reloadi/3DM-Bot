@@ -201,9 +201,6 @@ class MyTwitter():
 
                 image.save(self.tweet['file'])
 
-
-
-
     def count(self, id=0):
         return self.tdb.count(id)
 
@@ -246,6 +243,13 @@ class MyTwitter():
         track = self.tdb.get_tracking(id)
         self.tdb.delete(id)
         return track
+
+    def allowed(self, role_list):
+        roles   = [y.name.lower() for y in role_list]
+        allowed = eval(config['twitter']['allowed_roles'])
+        if any( True for x in allowed if x in roles ):
+            return True
+        return False
 
     def push(self, id, author, text, url, addedby, channel, author_id):
         self.tdb.add(id, author, text, url, addedby, channel, author_id)
