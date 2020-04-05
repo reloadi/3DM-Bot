@@ -5,7 +5,6 @@ status.log
 tweets.db
 *.jpg
 *.pyc
-3dm.cfg
 test/*
 disboard.py
 config.cfg

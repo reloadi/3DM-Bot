@@ -4,7 +4,7 @@ import praw
 
 import configparser
 config = configparser.ConfigParser()
-config.read('3dm.cfg')
+config.read('config.cfg')
 
 DISCORD_HOOK    = config['twitter']['hook']
 

@@ -9,7 +9,7 @@ from PIL import Image, ExifTags
 #import ExifTags
 
 config = configparser.ConfigParser()
-config.read('3dm.cfg')
+config.read('config.cfg')
 
 discord_link = "discord.gg/fPmuqzQ"
 # tag_phrase = [  'Sponsor needed for our next #3dprint #3dprinting contest!(parts/fila) #3dmodeling'

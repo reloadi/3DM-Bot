@@ -10,7 +10,7 @@ from humanfriendly import format_timespan
 
 import configparser
 config = configparser.ConfigParser()
-config.read('3dm.cfg')
+config.read('config.cfg')
 
 class Check():
     """server_name: the name of our server
