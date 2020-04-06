@@ -18,7 +18,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
 
-VERSION= "1.1.6"
+VERSION= "1.1.7"
 DEBUG  = True
 PREFIX = "!3DM"
 GCODE  = "!GCODE"
@@ -43,7 +43,7 @@ WELCOME_MESSAGE = "https://discordapp.com/channels/637075986726518794/6370762258
 t = MyTwitter()
 
 #client = discord.Client()
-bot = discord.ext.commands.Bot(command_prefix='!')
+bot = discord.ext.commands.Bot(command_prefix='/')
 bot.add_cog(DiceCog(bot))
 
 # fix some different way to type currency
@@ -58,18 +58,21 @@ def __help():
     output.add_field(name="!gcode some_text", value="Return result from marlin documentation", inline=False)
     output.add_field(name="!convert 100 usd", value="Convert 100 usd to common currencies", inline=False)
     output.add_field(name="!google some text", value="Search google for some text and display first result", inline=False)
-    output.add_field(name="!thing some text", value="Search thingiverse (using google for now) for some text and display first result", inline=False)
     output.add_field(name="!tweet link [user]", value="Link your discord user to a twitter account for tagging when posting. If [user] is ommited, display current link", inline=False)
-    output.add_field(name="!tweet unlink [user]", value="Remove link between discord account and twitter account", inline=False)
+    output.add_field(name="!tweet unlink", value="Remove link between discord account and twitter account", inline=False)
     output.add_field(name="!tweet top", value="Show top twitted members", inline=False)
     output.add_field(name="!tweet [list|delete|ID] [pos] short text (restricted)", value="Post a user's message (ID) to the twitter account.", inline=False)
-    output.add_field(name="!roll [xDn] (xDn...)",value="Where x is the number of dice and n is the number of sides on the dice. Ex: 1D6 2D8", inline=False)
+    output.add_field(name="Community",value="The following are community contributions", inline=False)
+    output.add_field(name="/roll [xDn] (xDn...)",value="Where x is the number of dice and n is the number of sides on the dice. Ex: 1D6 2D8", inline=False)
     return output
 
 # used for local debugging
-def __debug(msg):
+def __debug(msg, text=False):
     if DEBUG:
-        print("{0} {1} sent {2} in #{3}".format(ct.dark(datetime.now().strftime('%Y-%m-%d %H:%M:%S')), ct.cyan(msg.author), ct.invert(msg.content), ct.red(msg.channel)))
+        if not text:
+            print("{0} {1} sent {2} in #{3}".format(ct.dark(datetime.now().strftime('%Y-%m-%d %H:%M:%S')), ct.cyan(msg.author), ct.invert(msg.content), ct.red(msg.channel)))
+        else:
+            print("{0} debug: {1}".format(ct.dark(datetime.now().strftime('%Y-%m-%d %H:%M:%S')), ct.invert(msg)))
 
 # this method check if a message contain image and could be used for tweets
 # if it does, post a copy/desc in a logging channel for manual processing
@@ -119,10 +122,28 @@ async def noob(msg):
 
 @bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(bot))
+    __debug(f"on_ready - We have logged in as {bot.user}", True)
     booted = bot.get_channel(670757903678046218)
     await booted.send(f"I've been rebooted - v{VERSION}")
-
+@bot.event
+async def on_disconnect():
+    __debug('on_disconnect', True)
+@bot.event
+async def on_connect():
+    __debug('on_connect', True)
+@bot.event
+async def on_resumed():
+    __debug("on_resumed", True)
+@bot.event
+async def on_error(event, *args, **kwargs):
+    __debug(f"on_error: {event}", True)
+# Ignore command not found errors and don't print them to the output
+@bot.event
+async def on_command_error(ctx, error):
+    __debug(f"on_command_error: {error}", True)
+    if isinstance(error, CommandNotFound):
+        return
+    raise error
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -147,14 +168,6 @@ async def on_raw_reaction_add(payload):
             out_emb = discord.Embed(title="Not allowed", description="Thanks for your interest <@{0}>!\n\nIf you think you can help cleaning this, talk to a mod!".format(member.id), color=POST_COLOR)
             id = await cross_post.send(embed=out_emb)
             await id.delete(delay=8)
-        
-
-# Ignore command not found errors and don't print them to the output
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, CommandNotFound):
-        return
-    raise error
         
 @bot.event
 async def on_message(msg):
