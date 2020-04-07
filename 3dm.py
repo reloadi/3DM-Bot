@@ -42,7 +42,7 @@ WELCOME_MESSAGE = "https://discordapp.com/channels/637075986726518794/6370762258
 t = MyTwitter()
 
 #client = discord.Client()
-bot = discord.ext.commands.Bot(command_prefix='/')
+bot = discord.ext.commands.Bot(command_prefix='/', case_insensitive=True)
 bot.add_cog(DiceCog(bot))
 
 # fix some different way to type currency
