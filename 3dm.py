@@ -6,7 +6,6 @@ import re
 from datetime import datetime
 from currency_converter import CurrencyConverter as CConv
 
-from check import Check
 from include.linux_color import _c as ct
 from include.my_google import Google
 from include.twitter import MyTwitter
@@ -18,7 +17,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
 
-VERSION= "1.1.7"
+VERSION= "1.1.8"
 DEBUG  = True
 PREFIX = "!3DM"
 GCODE  = "!GCODE"
@@ -445,13 +444,6 @@ async def on_message(msg):
                     # if emoji:
                     #     await msg.add_reaction(emoji)
                     output = "test cmd\nCommand trigger: {0}\nChannel: {1}".format(PREFIX, msg.channel)
-                elif cmd[1] == "disboard":
-                    check = Check("3DMeltdown 3D Printing")
-                    check.load()
-                    output = "Current ranking:\n"
-                    for i in range(5):
-                        output += "{0} - {1} ({2})\n".format(i+1, check.index_list[i], check.index_time[i])
-                    output += "Last change: {1}\n".format(check.index_first, check.delta())
                 else:
                     output = "unknown cmd: {0}".format(cmd[1])
 
