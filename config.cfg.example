@@ -7,6 +7,9 @@ path = ./_gcode/
 
 [discord]
 token = discord_key
+serer_id = server_id
+bot_channel_id = channel_id_for_bot_join_message
+
 
 [google]
 api_key = api_key

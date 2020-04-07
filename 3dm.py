@@ -17,10 +17,13 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
 
-VERSION= "1.1.8"
+VERSION= "1.1.9"
 DEBUG  = True
 PREFIX = "!3DM"
 GCODE  = "!GCODE"
+
+SERVER_ID       = int(config['discord']['serer_id'])
+BOT_CHANNEL_ID  = int(config['discord']['bot_channel_id'])
 
 # currency converted config
 my_cur = eval(config['currency']['use'])
@@ -37,7 +40,7 @@ TRACKING_IMG    = int(config['img_log']['tracking_channel'])
 
 # used to help user unable to join the server
 JOIN_CHANNEL    = 689574436302880843
-WELCOME_MESSAGE = "https://discordapp.com/channels/637075986726518794/637076225843527690/637108901720096770"
+WELCOME_MESSAGE = f"https://discordapp.com/channels/{SERVER_ID}/637076225843527690/637108901720096770"
 
 t = MyTwitter()
 
@@ -93,7 +96,7 @@ async def checkImgPost(msg):
             if not any(xs in post_url for xs in ignore_domain):
                 check = re.search('(http[^ ]+(:?jpg|png|jpeg))', post_url.lower())
                 if check and not 'unknown.png' in post_url.lower():
-                    post_link = 'https://discordapp.com/channels/637075986726518794/{0}/{1}'.format( msg.channel.id, msg.id )
+                    post_link = 'https://discordapp.com/channels/{2}/{0}/{1}'.format( msg.channel.id, msg.id, SERVER_ID )
                     out_emb = discord.Embed(title="New image from: {0}".format(msg.author.display_name), 
                                             description="Sent in <#{0}> - _[original post]({2})_\n\n>>> `{1}`".format(msg.channel.id, msg.content, post_link), color=0xffffff)
                     try:
@@ -122,7 +125,7 @@ async def noob(msg):
 @bot.event
 async def on_ready():
     __debug(f"on_ready - We have logged in as {bot.user}", True)
-    booted = bot.get_channel(670757903678046218)
+    booted = bot.get_channel(BOT_CHANNEL_ID)
     await booted.send(f"I've been rebooted - v{VERSION}")
 @bot.event
 async def on_disconnect():
@@ -314,7 +317,7 @@ async def on_message(msg):
                                         await post_msg.add_reaction(emoji_3dm)
                                         await post_msg.add_reaction(emoji_twitter)
                                         cross_post = bot.get_channel(TRACKING_TWEETS)
-                                        post_link = 'https://discordapp.com/channels/637075986726518794/{0}/{1}'.format( msg.channel.id, post_msg.id )
+                                        post_link = 'https://discordapp.com/channels/{2}/{0}/{1}'.format( msg.channel.id, post_msg.id, SERVER_ID )
                                         out_emb = discord.Embed(title="New tweet queued from: {0}".format(post_msg.author.display_name), 
                                                                             description="Sent in <#{0}> - _[original post]({2})_\n\n>>> `{1}`".format(msg.channel.id, gs[2].replace('`', ''), post_link), color=0xffffff)
                                         #out_emb.set_author(name=post_link, url=post_link)
