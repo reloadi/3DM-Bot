@@ -85,6 +85,8 @@ class TweetDB():
     def get_nexts(self, limit=-1):
         return self.conn.execute("select author, substr(url,0,105), twitter_name from tweets left join twitter_account on tweets.author_id = twitter_account.id_user where posted = 0 order by datetime limit ?", (limit,)).fetchall()
 
+    def get_stat(self, author):
+        return self.conn.execute(f"select posted, count(id) from tweets where author = '{author}' group by posted order by posted").fetchall()
 
     def create_link(self, author, twitter_account):
         self.remove_link(author)

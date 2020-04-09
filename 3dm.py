@@ -17,7 +17,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
 
-VERSION= "1.1.9"
+VERSION= "1.1.10"
 DEBUG  = True
 PREFIX = "!3DM"
 GCODE  = "!GCODE"
@@ -63,6 +63,8 @@ def __help():
     output.add_field(name="!tweet link [user]", value="Link your discord user to a twitter account for tagging when posting. If [user] is ommited, display current link", inline=False)
     output.add_field(name="!tweet unlink", value="Remove link between discord account and twitter account", inline=False)
     output.add_field(name="!tweet top", value="Show top twitted members", inline=False)
+    output.add_field(name="!tweet stat", value="Show your current twitter stats", inline=False)
+    output.add_field(name="!tweet next", value="Display the next 5 tweets in queue", inline=False)
     output.add_field(name="!tweet [list|delete|ID] [pos] short text (restricted)", value="Post a user's message (ID) to the twitter account.", inline=False)
     output.add_field(name="Community",value="The following are community contributions", inline=False)
     output.add_field(name="/roll [xDn] (xDn...)",value="Where x is the number of dice and n is the number of sides on the dice. Ex: 1D6 2D8", inline=False)
@@ -125,8 +127,8 @@ async def noob(msg):
 @bot.event
 async def on_ready():
     __debug(f"on_ready - We have logged in as {bot.user}", True)
-    booted = bot.get_channel(BOT_CHANNEL_ID)
-    await booted.send(f"I've been rebooted - v{VERSION}")
+    # booted = bot.get_channel(BOT_CHANNEL_ID)
+    # await booted.send(f"I've been rebooted - v{VERSION}")
 @bot.event
 async def on_disconnect():
     __debug('on_disconnect', True)
@@ -213,7 +215,7 @@ async def on_message(msg):
                 out_emb = False
                 sub_msg = msg.content[7:].upper()
                 # Check if user is allowed to use this command
-                if t.allowed(msg.author.roles) or sub_msg.startswith("TOP") or sub_msg.startswith("LINK") or sub_msg.startswith("UNLINK") or sub_msg.startswith("SHOW"):
+                if t.allowed(msg.author.roles) or sub_msg.startswith("TOP") or sub_msg.startswith("LINK") or sub_msg.startswith("UNLINK") or sub_msg.startswith("SHOW") or sub_msg.startswith("NEXT") or sub_msg.startswith("STAT"):
                     emoji_twitter   = discord.utils.get(bot.emojis, name='twitter')
                     emoji_3dm       = discord.utils.get(bot.emojis, name='3dm2')
                     delete_post     = True
@@ -244,6 +246,15 @@ async def on_message(msg):
                         out_msg += "3DMeltdown top cleaner:\n"
                         for i in t.tdb.top_clean():
                             out_msg += "**{0}** - {1} cleans\n".format( (i[0] if i[0] else 'none'), i[1])
+                    elif sub_msg.startswith("STAT"):
+                        out_msg += "3DMeltdown twitter stats: (_<https://twitter.com/3DMeltdown>_)\n"
+                        out_msg += f"Member: **{msg.author.display_name}**\n"
+                        infos = t.tdb.get_stat(msg.author.display_name)
+                        if infos:
+                            out_msg += f"Total queued tweets: **{infos[0][0]}**\n"
+                            out_msg += f"Total posted tweets: **{infos[0][1]}**\n"
+                        else:
+                            out_msg += "No stats found"
                     elif sub_msg.startswith("TOP"):
                         out_msg += "3DMeltdown top 10 tweeted members: (_<https://twitter.com/3DMeltdown>_)\n"
                         x=1
