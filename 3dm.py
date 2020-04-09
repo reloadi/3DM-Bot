@@ -17,7 +17,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
 
-VERSION= "1.1.10"
+VERSION= "1.1.11"
 DEBUG  = True
 PREFIX = "!3DM"
 GCODE  = "!GCODE"
@@ -63,7 +63,7 @@ def __help():
     output.add_field(name="!tweet link [user]", value="Link your discord user to a twitter account for tagging when posting. If [user] is ommited, display current link", inline=False)
     output.add_field(name="!tweet unlink", value="Remove link between discord account and twitter account", inline=False)
     output.add_field(name="!tweet top", value="Show top twitted members", inline=False)
-    output.add_field(name="!tweet stat", value="Show your current twitter stats", inline=False)
+    output.add_field(name="!tweet stat [user]", value="Show current twitter stats for [user] or yourself", inline=False)
     output.add_field(name="!tweet next", value="Display the next 5 tweets in queue", inline=False)
     output.add_field(name="!tweet [list|delete|ID] [pos] short text (restricted)", value="Post a user's message (ID) to the twitter account.", inline=False)
     output.add_field(name="Community",value="The following are community contributions", inline=False)
@@ -99,7 +99,7 @@ async def checkImgPost(msg):
                 check = re.search('(http[^ ]+(:?jpg|png|jpeg))', post_url.lower())
                 if check and not 'unknown.png' in post_url.lower():
                     post_link = 'https://discordapp.com/channels/{2}/{0}/{1}'.format( msg.channel.id, msg.id, SERVER_ID )
-                    out_emb = discord.Embed(title="New image from: {0}".format(msg.author.display_name), 
+                    out_emb = discord.Embed(title="New image from: {0}".format(msg.author.display_name),
                                             description="Sent in <#{0}> - _[original post]({2})_\n\n>>> `{1}`".format(msg.channel.id, msg.content, post_link), color=0xffffff)
                     try:
                         out_emb.set_thumbnail(url=post_url)
@@ -115,7 +115,7 @@ async def checkImgPost(msg):
 
 # this print out a message to a user in the join-help channel
 async def noob(msg):
-    out_emb = discord.Embed(title="Welcome to 3DMeltdown".format(msg.author.display_name), 
+    out_emb = discord.Embed(title="Welcome to 3DMeltdown".format(msg.author.display_name),
                                 description="Hi <@{0}>! This room is only to help you join the server.\n\nPlease see [this message]({1}) to join the server, you need to react to gain access.\n\nIf for some reason, you can't join, please tag the mod using\n`@mod your message` someone should be able to help.".format(msg.author.id, WELCOME_MESSAGE), color=POST_COLOR)
     out_emb.set_footer(text="This message (and yours) will self-delete in 12 hours".format(msg.id))
     id = await msg.channel.send(embed=out_emb)
@@ -172,7 +172,7 @@ async def on_raw_reaction_add(payload):
             out_emb = discord.Embed(title="Not allowed", description="Thanks for your interest <@{0}>!\n\nIf you think you can help cleaning this, talk to a mod!".format(member.id), color=POST_COLOR)
             id = await cross_post.send(embed=out_emb)
             await id.delete(delay=8)
-        
+
 @bot.event
 async def on_message(msg):
     if msg.author == bot.user:
@@ -186,7 +186,7 @@ async def on_message(msg):
         if msg.channel.id == JOIN_CHANNEL:
             await noob(msg)
             return
-        
+
         # check if it's a image for the image log (for twitter posts)
         await checkImgPost(msg)
 
@@ -246,13 +246,21 @@ async def on_message(msg):
                         out_msg += "3DMeltdown top cleaner:\n"
                         for i in t.tdb.top_clean():
                             out_msg += "**{0}** - {1} cleans\n".format( (i[0] if i[0] else 'none'), i[1])
+                    # !tweet stat [user]
                     elif sub_msg.startswith("STAT"):
+                        # check if a user was provided
+                        twho = re.search('^ *(.+)', msg.content[12:])
+                        if not twho:
+                            twho = msg.author.display_name
+                        else:
+                            twho = twho.group(1)
                         out_msg += "3DMeltdown twitter stats: (_<https://twitter.com/3DMeltdown>_)\n"
-                        out_msg += f"Member: **{msg.author.display_name}**\n"
-                        infos = t.tdb.get_stat(msg.author.display_name)
+                        out_msg += f"Member: **{twho}**\n"
+                        # get info about the user
+                        infos = t.tdb.get_stat(twho)
                         if infos:
-                            out_msg += f"Total queued tweets: **{infos[0][0]}**\n"
-                            out_msg += f"Total posted tweets: **{infos[0][1]}**\n"
+                            out_msg += f"Total queued tweets: **{infos[0][1]}**\n"
+                            out_msg += f"Total posted tweets: **{infos[1][1]}**\n"
                         else:
                             out_msg += "No stats found"
                     elif sub_msg.startswith("TOP"):
@@ -329,7 +337,7 @@ async def on_message(msg):
                                         await post_msg.add_reaction(emoji_twitter)
                                         cross_post = bot.get_channel(TRACKING_TWEETS)
                                         post_link = 'https://discordapp.com/channels/{2}/{0}/{1}'.format( msg.channel.id, post_msg.id, SERVER_ID )
-                                        out_emb = discord.Embed(title="New tweet queued from: {0}".format(post_msg.author.display_name), 
+                                        out_emb = discord.Embed(title="New tweet queued from: {0}".format(post_msg.author.display_name),
                                                                             description="Sent in <#{0}> - _[original post]({2})_\n\n>>> `{1}`".format(msg.channel.id, gs[2].replace('`', ''), post_link), color=0xffffff)
                                         #out_emb.set_author(name=post_link, url=post_link)
                                         out_emb.set_footer(text="added by {0}".format(msg.author.display_name), icon_url="https://cdn.discordapp.com/emojis/673897582375993365.png")
@@ -498,7 +506,7 @@ async def on_message(msg):
                     await msg.channel.send(embed=output)
                 else:
                     await msg.channel.send("no result found for `{0}`".format(search))
-        else:    
+        else:
             await bot.process_commands(msg)
 
 
