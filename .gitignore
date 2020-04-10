@@ -6,7 +6,6 @@ tweets.db
 *.jpg
 *.pyc
 test/*
-tools/*
 config.cfg
 disboard.py
 check.py
