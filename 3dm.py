@@ -197,7 +197,7 @@ async def on_message(msg):
                 __debug(msg)
                 await msg.author.add_roles(discord.utils.get(msg.author.guild.roles, name="weeb"))
                 await msg.channel.send("{0} used the `w` word.. adding role.".format(msg.author.display_name))
-        if "ANUS" in msg_content or re.search("ANAL(?!I|Y|O)", msg_content):
+        if re.search("(?!R|T)ANUS", msg_content) or re.search("ANAL(?!I|Y|O)", msg_content):
             roles   = [y.name.lower() for y in msg.author.roles]
             if not "anal" in roles:
                 __debug(msg)
@@ -217,7 +217,7 @@ async def on_message(msg):
                 # Check if user is allowed to use this command
                 if t.allowed(msg.author.roles) or sub_msg.startswith("TOP") or sub_msg.startswith("LINK") or sub_msg.startswith("UNLINK") or sub_msg.startswith("SHOW") or sub_msg.startswith("NEXT") or sub_msg.startswith("STAT"):
                     emoji_twitter   = discord.utils.get(bot.emojis, name='twitter')
-                    emoji_3dm       = discord.utils.get(bot.emojis, name='3dm2')
+                    emoji_3dm       = discord.utils.get(bot.emojis, name='3dm')
                     delete_post     = True
                     if sub_msg.startswith("LIST"):
                         out_msg += "DB contain {0} entry. Displaying lastest 5.".format(t.count())
@@ -462,7 +462,7 @@ async def on_message(msg):
                     # emoji = discord.utils.get(bot.emojis, name='twitter')
                     # if emoji:
                     #     await msg.add_reaction(emoji)
-                    # emoji = discord.utils.get(bot.emojis, name='3dm2')
+                    # emoji = discord.utils.get(bot.emojis, name='3dm')
                     # if emoji:
                     #     await msg.add_reaction(emoji)
                     output = "test cmd\nCommand trigger: {0}\nChannel: {1}".format(PREFIX, msg.channel)
