@@ -165,10 +165,8 @@ async def on_raw_reaction_add(payload):
             await image_post.delete()
             t.tdb.del_image_log(payload.message_id, payload.channel_id)
             t.tdb.add_clean(payload.user_id, payload.member.name)
-        # not allowed, post a message and remove reaction
+        # not allowed, post a message
         else:
-            emoji_delete   = discord.utils.get(bot.emojis, name=DELETE_EMOJI)
-            await image_post.remove_reaction(emoji_delete, member)
             out_emb = discord.Embed(title="Not allowed", description="Thanks for your interest <@{0}>!\n\nIf you think you can help cleaning this, talk to a mod!".format(member.id), color=POST_COLOR)
             id = await cross_post.send(embed=out_emb)
             await id.delete(delay=8)
@@ -197,7 +195,7 @@ async def on_message(msg):
                 __debug(msg)
                 await msg.author.add_roles(discord.utils.get(msg.author.guild.roles, name="weeb"))
                 await msg.channel.send("{0} used the `w` word.. adding role.".format(msg.author.display_name))
-        if re.search("(?!R|T)ANUS", msg_content) or re.search("ANAL(?!I|Y|O)", msg_content):
+        if re.search("ANUS", msg_content) or re.search("ANAL(?!I|Y|O)", msg_content):
             roles   = [y.name.lower() for y in msg.author.roles]
             if not "anal" in roles:
                 __debug(msg)
@@ -217,7 +215,7 @@ async def on_message(msg):
                 # Check if user is allowed to use this command
                 if t.allowed(msg.author.roles) or sub_msg.startswith("TOP") or sub_msg.startswith("LINK") or sub_msg.startswith("UNLINK") or sub_msg.startswith("SHOW") or sub_msg.startswith("NEXT") or sub_msg.startswith("STAT"):
                     emoji_twitter   = discord.utils.get(bot.emojis, name='twitter')
-                    emoji_3dm       = discord.utils.get(bot.emojis, name='3dm')
+                    emoji_3dm       = discord.utils.get(bot.emojis, name='3DM')
                     delete_post     = True
                     if sub_msg.startswith("LIST"):
                         out_msg += "DB contain {0} entry. Displaying lastest 5.".format(t.count())
@@ -387,7 +385,7 @@ async def on_message(msg):
         elif msg_content.startswith("!CONVERT") or msg_content.startswith("/CONVERT"):
             __debug(msg)
 
-            cmd = re.search('^.CONVERT *([\.\d]+) *(.*)', msg_content)
+            cmd = re.search(r'^.CONVERT *([\.\d]+) *(.*)', msg_content)
             if not cmd:
                 await msg.channel.send(embed=__help())
             else:
@@ -459,12 +457,6 @@ async def on_message(msg):
                         output = "No member fixed"
 
                 elif cmd[1] == "test":
-                    # emoji = discord.utils.get(bot.emojis, name='twitter')
-                    # if emoji:
-                    #     await msg.add_reaction(emoji)
-                    # emoji = discord.utils.get(bot.emojis, name='3dm')
-                    # if emoji:
-                    #     await msg.add_reaction(emoji)
                     output = "test cmd\nCommand trigger: {0}\nChannel: {1}".format(PREFIX, msg.channel)
                 else:
                     output = "unknown cmd: {0}".format(cmd[1])
