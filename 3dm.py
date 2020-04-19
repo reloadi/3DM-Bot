@@ -115,9 +115,12 @@ async def checkImgPost(msg):
 
 # this print out a message to a user in the join-help channel
 async def noob(msg):
-    out_emb = discord.Embed(title="Welcome to 3DMeltdown".format(msg.author.display_name),
-                                description="Hi <@{0}>! This room is only to help you join the server.\n\nPlease see [this message]({1}) to join the server, you need to react to gain access.\n\nIf for some reason, you can't join, please tag the mod using\n`@mod your message` someone should be able to help.".format(msg.author.id, WELCOME_MESSAGE), color=POST_COLOR)
-    out_emb.set_footer(text="This message (and yours) will self-delete in 12 hours".format(msg.id))
+    out_emb = discord.Embed(title="Welcome to 3DMeltdown",
+                                description="Hi <@{0}>! This room is only to help you join the server.\n\n"\
+                                    "Please see [this message]({1}) to join the server, you need to react to gain access.\n\n"\
+                                    "If for some reason, you can't join, please tag the mod using\n"\
+                                    "`@mod your message` someone should be able to help.".format(msg.author.id, WELCOME_MESSAGE), color=POST_COLOR)
+    out_emb.set_footer(text="This message (and yours) will self-delete in 12 hours")
     id = await msg.channel.send(embed=out_emb)
     await id.delete(delay=43200)
     await msg.delete(delay=43200)
@@ -167,7 +170,8 @@ async def on_raw_reaction_add(payload):
             t.tdb.add_clean(payload.user_id, payload.member.name)
         # not allowed, post a message
         else:
-            out_emb = discord.Embed(title="Not allowed", description="Thanks for your interest <@{0}>!\n\nIf you think you can help cleaning this, talk to a mod!".format(member.id), color=POST_COLOR)
+            out_emb = discord.Embed(title="Not allowed", description="Thanks for your interest <@{0}>!\n\n"\
+                                                            "If you think you can help cleaning this, talk to a mod!".format(member.id), color=POST_COLOR)
             id = await cross_post.send(embed=out_emb)
             await id.delete(delay=8)
 
@@ -213,7 +217,8 @@ async def on_message(msg):
                 out_emb = False
                 sub_msg = msg.content[7:].upper()
                 # Check if user is allowed to use this command
-                if t.allowed(msg.author.roles) or sub_msg.startswith("TOP") or sub_msg.startswith("LINK") or sub_msg.startswith("UNLINK") or sub_msg.startswith("SHOW") or sub_msg.startswith("NEXT") or sub_msg.startswith("STAT"):
+                if t.allowed(msg.author.roles) or sub_msg.startswith("TOP") or sub_msg.startswith("LINK") or sub_msg.startswith("UNLINK") \
+                                or sub_msg.startswith("SHOW") or sub_msg.startswith("NEXT") or sub_msg.startswith("STAT"):
                     emoji_twitter   = discord.utils.get(bot.emojis, name='twitter')
                     emoji_3dm       = discord.utils.get(bot.emojis, name='3DM')
                     delete_post     = True
@@ -224,7 +229,7 @@ async def on_message(msg):
                         if not out_msg:
                             out_msg = "DB is empty"
                     elif sub_msg.startswith("DELETE"):
-                        id = re.search('^ *(\d+)', msg.content[14:]).group(1)
+                        id = re.search(r'^ *(\d+)', msg.content[14:]).group(1)
                         track = t.delete(id)
                         try:
                             mm = await bot.get_channel(TRACKING_TWEETS).fetch_message(track)
@@ -300,7 +305,7 @@ async def on_message(msg):
                             out_msg += "[{0}] is not currently linked".format(msg.author)
 
                     else:
-                        gs = re.search('^ *(\d+) *(\d)? +(.*)', msg.content[7:]).groups()
+                        gs = re.search(r'^ *(\d+) *(\d)? +(.*)', msg.content[7:]).groups()
                         # check if enough parametter
                         if len(gs) >= 2:
                             if len(gs[2]) <= 125:
@@ -407,7 +412,7 @@ async def on_message(msg):
             if len(msg.content) < 11:
                 await msg.channel.send(embed=__help())
             else:
-                g = Google(**config['google']);
+                g = Google(**config['google'])
 
                 result = g.search(msg.content[8:])
 
@@ -465,7 +470,7 @@ async def on_message(msg):
 
         # useless unit conversion
         elif msg_content.startswith("!MMS"):
-            cmd = re.search('^!MMS *([\.\d]+)', msg_content)
+            cmd = re.search(r'^!MMS *([\.\d]+)', msg_content)
             if cmd:
                 nb = float(cmd.groups()[0])
                 output = discord.Embed(description="American conversion: `{0:0.2f}` (mm/sec)".format(nb), color=POST_COLOR)
@@ -488,8 +493,8 @@ async def on_message(msg):
                 gcode = subprocess.check_output('grep -i '+search+' '+search_path+'* |sed \'s/:.*//\' |uniq -c |sort -r |awk \'{print $2}\' |head -n 5', shell=True).splitlines()
                 for g in gcode:
                     content = open(g, "r").read()
-                    desc = re.search('title: (.*)', content).group(1)
-                    code = re.search('codes: \[ (.*?) ]', content).group(1)
+                    desc = re.search(r'title: (.*)', content).group(1)
+                    code = re.search(r'codes: \[ (.*?) ]', content).group(1)
                     link = "https://marlinfw.org/docs/gcode/{0}.html".format( re.search("b'(.*?).md'", str(g).replace(search_path,'')).group(1) )
 
                     output.add_field(name=code+": "+desc, value=link, inline=False)
