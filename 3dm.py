@@ -3,6 +3,8 @@ from discord.ext.commands import CommandNotFound
 import subprocess
 import signal
 import re
+import os
+import asyncio
 from datetime import datetime
 from currency_converter import CurrencyConverter as CConv
 
@@ -11,7 +13,7 @@ from include.my_google import Google
 from include.twitter import MyTwitter
 
 #Cogs
-from Cogs.DiceCog import DiceCog
+#from Cogs.DiceCog import DiceCog
 
 import configparser
 config = configparser.ConfigParser()
@@ -44,9 +46,9 @@ WELCOME_MESSAGE = f"https://discordapp.com/channels/{SERVER_ID}/6370762258435276
 
 t = MyTwitter()
 
-#client = discord.Client()
-bot = discord.ext.commands.Bot(command_prefix='/', case_insensitive=True)
-bot.add_cog(DiceCog(bot))
+bot = discord.Client()
+#bot = discord.ext.commands.Bot(command_prefix='/', case_insensitive=True)
+#bot.add_cog(DiceCog(bot))
 
 # fix some different way to type currency
 class cc_arg():
@@ -127,6 +129,39 @@ async def noob(msg):
 
     return True
 
+async def my_background_task():
+    me = bot.guild.members
+    fixed = []
+    for x in me:
+        roles   = [y.name.lower() for y in x.roles]
+        if x.bot or 'poop hitter' in roles:
+            continue
+        fixed.append(x)
+        await x.add_roles(discord.utils.get(msg.author.guild.roles, name="poop hitter"))
+    output = ""
+    if fixed:
+        output = "Fixed members: {0}\n".format(len(fixed))
+        for x in fixed:
+            output += "- {0} ({1})\n".format(x, x.display_name)
+    else:
+        output = "No member fixed"
+
+    await client.wait_until_ready()
+    counter = 0
+    channel = discord.Object(id='channel_id_here')
+    while not client.is_closed:
+        counter += 1
+        await client.send_message(channel, counter)
+        await asyncio.sleep(60) # task runs every 60 seconds
+
+async def play_voice(sound):
+    vc = await bot.get_channel(637399140086710292).connect()
+    vc.play(discord.FFmpegPCMAudio("sound/" + sound.lower() + '.mp3'), after=lambda e: print('done', e))
+    while vc.is_playing():
+        await asyncio.sleep(1)
+    vc.stop()
+    await vc.disconnect()
+
 @bot.event
 async def on_ready():
     __debug(f"on_ready - We have logged in as {bot.user}", True)
@@ -141,9 +176,9 @@ async def on_connect():
 @bot.event
 async def on_resumed():
     __debug("on_resumed", True)
-@bot.event
-async def on_error(event, *args, **kwargs):
-    __debug(f"on_error: {event}", True)
+# @bot.event
+# async def on_error(event, *args, **kwargs):
+#     __debug(f"on_error: {event}", True)
 # Ignore command not found errors and don't print them to the output
 @bot.event
 async def on_command_error(ctx, error):
@@ -249,6 +284,7 @@ async def on_message(msg):
                         out_msg += "3DMeltdown top cleaner:\n"
                         for i in t.tdb.top_clean():
                             out_msg += "**{0}** - {1} cleans\n".format( (i[0] if i[0] else 'none'), i[1])
+                        delete_post = False
                     # !tweet stat [user]
                     elif sub_msg.startswith("STAT"):
                         # check if a user was provided
@@ -479,6 +515,18 @@ async def on_message(msg):
                 output.add_field(name="mph", value="{0:0.5f}".format(nb/447), inline=True)
                 await msg.channel.send(embed=output)
 
+        elif msg_content.startswith("!VC"):
+            cmd = re.search(r'^!VC *(.*)', msg_content)
+            if cmd:
+                if cmd.groups()[0].upper().startswith("LIST"):
+                    output = ""
+                    for s in os.listdir("sound/"):
+                        output += "sound: {0}\n".format(s)
+                    await msg.channel.send(output)
+                else:
+                    await play_voice(cmd.groups()[0])
+
+
         # gcode/marlin search
         elif msg_content.startswith(GCODE):
             __debug(msg)
@@ -503,8 +551,8 @@ async def on_message(msg):
                     await msg.channel.send(embed=output)
                 else:
                     await msg.channel.send("no result found for `{0}`".format(search))
-        else:
-            await bot.process_commands(msg)
+#        else:
+#            await bot.process_commands(msg)
 
 
 bot.run(config['discord']['token'])
