@@ -1,4 +1,4 @@
-from instapy_cli import client
+#from instapy_cli import client
 from discord_webhook import DiscordWebhook, DiscordEmbed
 import praw
 
@@ -15,7 +15,7 @@ from include.twitter import MyTwitter
 
 t = MyTwitter()
 if t.fetch_next():
-#        print("{0} - {1}".format(t.tweet['author'], t.tweet['text_tag']))
+    print("{0} - {1}".format(t.tweet['author'], t.tweet['text_tag']))
     try:
         reddit.subreddit('3dmeltdown').submit_image( "{0} - {1}".format(t.tweet['author'], t.tweet['text_tag']), t.tweet['file'], send_replies=False)
     except:

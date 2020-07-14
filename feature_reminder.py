@@ -23,8 +23,6 @@ post = [ [ "#octorant", "Octorant is a small octoprint plug-in that will send a 
          [ "3D Printing Contest", "Every month, we have a 3d printing with prize for the winner!\nSee <#651199972221517824> for more details!\n\n[See previous contest winners](https://discordapp.com/channels/637075986726518794/663124219147583489/663124922624638981)"],
          [ "3D Printing Contest", "Every month, we have a 3d printing with prize for the winner!\nSee <#651199972221517824> for more details!\n\n[See previous contest winners](https://discordapp.com/channels/637075986726518794/663124219147583489/663124922624638981)"],
          [ "3DM-bot", "We are constantly adding new features to the bot. Type `!3dm` in any channels to see available commands"],
-         [ "3DM-bot-GitHub", "Our bot is open source and you can tweak/fix/add features you'd like to see using pull request! [Click here for the github repo](https://github.com/hetile1/3DM-Bot)!"],
-         [ "3DM-bot-GitHub", "Our bot is open source and you can tweak/fix/add features you'd like to see using pull request! [Click here for the github repo](https://github.com/hetile1/3DM-Bot)!"],
          [ "Roles", "All community members should select the printer(s) they use to help smooth the talk and support!\n\nCheck out <#637459709947019266> to select yours!"],
          [ "Roles", "All community members should select the printer(s) they use to help smooth the talk and support!\n\nCheck out <#637459709947019266> to select yours!"],
          [ "Roles", "All community members should select the printer(s) they use to help smooth the talk and support!\n\nCheck out <#637459709947019266> to select yours!"],

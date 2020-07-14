@@ -3,6 +3,11 @@ from discord.ext.commands import CommandNotFound
 import subprocess
 import signal
 import re
+import os
+import asyncio
+import urllib.request
+import requests
+from zipfile import ZipFile
 from datetime import datetime
 from currency_converter import CurrencyConverter as CConv
 
@@ -11,13 +16,13 @@ from include.my_google import Google
 from include.twitter import MyTwitter
 
 #Cogs
-from Cogs.DiceCog import DiceCog
+#from Cogs.DiceCog import DiceCog
 
 import configparser
 config = configparser.ConfigParser()
 config.read('config.cfg')
 
-VERSION= "1.1.11"
+VERSION= "1.1.24 - on aws"
 DEBUG  = True
 PREFIX = "!3DM"
 GCODE  = "!GCODE"
@@ -42,11 +47,13 @@ TRACKING_IMG    = int(config['img_log']['tracking_channel'])
 JOIN_CHANNEL    = 689574436302880843
 WELCOME_MESSAGE = f"https://discordapp.com/channels/{SERVER_ID}/637076225843527690/637108901720096770"
 
+COUNT_CHANNEL   = 732365559647174736
+
 t = MyTwitter()
 
-#client = discord.Client()
-bot = discord.ext.commands.Bot(command_prefix='/', case_insensitive=True)
-bot.add_cog(DiceCog(bot))
+bot = discord.Client()
+#bot = discord.ext.commands.Bot(command_prefix='/', case_insensitive=True)
+#bot.add_cog(DiceCog(bot))
 
 # fix some different way to type currency
 class cc_arg():
@@ -74,9 +81,9 @@ def __help():
 def __debug(msg, text=False):
     if DEBUG:
         if not text:
-            print("{0} {1} sent {2} in #{3}".format(ct.dark(datetime.now().strftime('%Y-%m-%d %H:%M:%S')), ct.cyan(msg.author), ct.invert(msg.content), ct.red(msg.channel)))
+            print("{0} {1} sent {2} in #{3}".format(ct.dark(datetime.now().strftime('%Y-%m-%d %H:%M:%S')), ct.cyan(msg.author), ct.invert(msg.content), ct.red(msg.channel)), flush=True)
         else:
-            print("{0} debug: {1}".format(ct.dark(datetime.now().strftime('%Y-%m-%d %H:%M:%S')), ct.invert(msg)))
+            print("{0} debug: {1}".format(ct.dark(datetime.now().strftime('%Y-%m-%d %H:%M:%S')), ct.invert(msg)), flush=True)
 
 # this method check if a message contain image and could be used for tweets
 # if it does, post a copy/desc in a logging channel for manual processing
@@ -127,11 +134,70 @@ async def noob(msg):
 
     return True
 
+async def count_control(msg):
+    roles   = [y.name.lower() for y in msg.author.roles]
+    if re.match( r"I(?:'M| AM) A LO*SER" , msg.content.upper() ):
+        __debug("line match", True)
+        if "loser" in roles:
+            __debug("role present", True)
+            out_emb = discord.Embed(title="so.. you're a loser",
+                                        description="Thanks for reconnizing it <@{0}>! We'll make it easy on you.\n\n"\
+                                            "Your countdown started. You will get tagged once you can re-gain the role.\n\n"\
+                                            "\n\nTHE DELAY IS CURRENTLY OFF, YOU GET THE ROLE BACK.\n\n"\
+                                            "This message will self-delete in 30 sec. Yours in 1 hour".format(msg.author.id), color=POST_COLOR)
+            #out_emb.set_footer(text="This message will self-delete in 30 sec. Yours in 12 hours")
+            id = await msg.channel.send(embed=out_emb)
+            await id.delete(delay=30)
+            await msg.author.remove_roles(discord.utils.get(msg.author.guild.roles, name="Loser"))
+            await msg.delete(delay=3600)
+    else:
+        await msg.delete()
+
+    return True
+
+
+async def my_background_task():
+    me = bot.guild.members
+    fixed = []
+    for x in me:
+        roles   = [y.name.lower() for y in x.roles]
+        if x.bot or 'poop hitter' in roles:
+            continue
+        fixed.append(x)
+        await x.add_roles(discord.utils.get(msg.author.guild.roles, name="poop hitter"))
+    output = ""
+    if fixed:
+        output = "Fixed members: {0}\n".format(len(fixed))
+        for x in fixed:
+            output += "- {0} ({1})\n".format(x, x.display_name)
+    else:
+        output = "No member fixed"
+
+    await client.wait_until_ready()
+    counter = 0
+    channel = discord.Object(id='channel_id_here')
+    while not client.is_closed:
+        counter += 1
+        await client.send_message(channel, counter)
+        await asyncio.sleep(60) # task runs every 60 seconds
+
+async def play_voice(sound, ch):
+    if not ch:
+        ch = 637399140086710292
+
+    print(f"ch: {ch}")
+    vc = await bot.get_channel(int(ch)).connect()
+    vc.play(discord.FFmpegPCMAudio("sound/" + sound.lower() + '.mp3'), after=lambda e: print('done', e))
+    while vc.is_playing():
+        await asyncio.sleep(1)
+    vc.stop()
+    await vc.disconnect()
+
 @bot.event
 async def on_ready():
     __debug(f"on_ready - We have logged in as {bot.user}", True)
-    # booted = bot.get_channel(BOT_CHANNEL_ID)
-    # await booted.send(f"I've been rebooted - v{VERSION}")
+    booted = bot.get_channel(BOT_CHANNEL_ID)
+    await booted.send(f"I've been rebooted - v{VERSION}")
 @bot.event
 async def on_disconnect():
     __debug('on_disconnect', True)
@@ -141,9 +207,9 @@ async def on_connect():
 @bot.event
 async def on_resumed():
     __debug("on_resumed", True)
-@bot.event
-async def on_error(event, *args, **kwargs):
-    __debug(f"on_error: {event}", True)
+# @bot.event
+# async def on_error(event, *args, **kwargs):
+#     __debug(f"on_error: {event}", True)
 # Ignore command not found errors and don't print them to the output
 @bot.event
 async def on_command_error(ctx, error):
@@ -165,6 +231,7 @@ async def on_raw_reaction_add(payload):
         image_post = await cross_post.fetch_message(payload.message_id)
         # check if member is allowed
         if t.allowed(member.roles):
+            __debug(f"{payload.member.name} deleted {payload.message_id}", True)
             await image_post.delete()
             t.tdb.del_image_log(payload.message_id, payload.channel_id)
             t.tdb.add_clean(payload.user_id, payload.member.name)
@@ -187,6 +254,11 @@ async def on_message(msg):
         # If the message is in the join-issue channel
         if msg.channel.id == JOIN_CHANNEL:
             await noob(msg)
+            return
+
+        if msg.channel.id == COUNT_CHANNEL:
+            __debug(msg)
+            await count_control(msg)
             return
 
         # check if it's a image for the image log (for twitter posts)
@@ -245,10 +317,12 @@ async def on_message(msg):
                         out_msg += "3DMeltdown top 3DM-twitters:\n"
                         for i in t.tdb.top_twitter():
                             out_msg += "**{0}** - {1} post(s)\n".format( (i[0] if i[0] else 'none'), i[1])
+                        delete_post = False
                     elif sub_msg.startswith("TOP_CLEAN"):
                         out_msg += "3DMeltdown top cleaner:\n"
                         for i in t.tdb.top_clean():
                             out_msg += "**{0}** - {1} cleans\n".format( (i[0] if i[0] else 'none'), i[1])
+                        delete_post = False
                     # !tweet stat [user]
                     elif sub_msg.startswith("STAT"):
                         # check if a user was provided
@@ -479,6 +553,52 @@ async def on_message(msg):
                 output.add_field(name="mph", value="{0:0.5f}".format(nb/447), inline=True)
                 await msg.channel.send(embed=output)
 
+        elif msg_content.startswith("!VC"):
+            cmd = re.search(r'^!vc *(.*?) *(\d*)$', msg.content,  flags=re.IGNORECASE)
+#            __debug("match: {}".format(cmd))
+            if cmd:
+                if cmd.groups()[0].upper().startswith("LIST"):
+                    output = "Available sounds:\n"
+                    for s in os.listdir("sound/"):
+                        if s.upper().endswith("MP3"):
+                            output += "- *{0}*\n".format(s.lower().replace(".mp3", ""))
+                    output += "use: `!vc sound` to play it"
+                    await msg.channel.send(output)
+                elif cmd.groups()[0].upper().startswith("GET"):
+                    url = re.search(r'GET *(HTTP[^ ]*) *(.*)', cmd.groups()[0], flags=re.IGNORECASE)
+                    if url:
+                        source_filename = re.search(r'/([^/]*?\.[^/]*)$', url.groups()[0]).groups()[0]
+                        if url.groups()[1]:
+                            source_filename = url.groups()[1] + ".mp3"
+                        print("source url: {0} source filename: {1}".format(url.groups()[0], source_filename))
+
+                        filename = "/tmp/" + source_filename
+                        f = open(filename,'wb')
+                        ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.123 Safari/537.36'
+                        f.write(requests.get(url.groups()[0], headers={'User-Agent': ua}).content)
+                        f.close()
+
+
+                        #filename, headers = urllib.request.urlretrieve(url.groups()[0])
+
+
+                        if source_filename.upper().endswith("ZIP"):
+                            zf = ZipFile(filename, 'r')
+                            zf.extractall('sound/')
+                            zf.close()
+                            os.remove(filename)
+                        elif source_filename.upper().endswith("MP3"):
+                            os.rename(filename, "sound/"+source_filename)
+
+                        for s in os.listdir("sound/"):
+                            if s.upper().endswith("MP3"):
+                                if s != s.lower():
+                                    os.rename("sound/"+s, "sound/"+s.lower())
+
+                else:
+                    await play_voice(cmd.groups()[0], cmd.groups()[1])
+
+
         # gcode/marlin search
         elif msg_content.startswith(GCODE):
             __debug(msg)
@@ -503,8 +623,8 @@ async def on_message(msg):
                     await msg.channel.send(embed=output)
                 else:
                     await msg.channel.send("no result found for `{0}`".format(search))
-        else:
-            await bot.process_commands(msg)
+#        else:
+#            await bot.process_commands(msg)
 
 
 bot.run(config['discord']['token'])
