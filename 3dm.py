@@ -141,7 +141,7 @@ async def count_control(msg):
         if "loser" in roles:
             __debug("role present", True)
             out_emb = discord.Embed(title="so.. you're a loser",
-                                        description="Thanks for reconnizing it <@{0}>! We'll make it easy on you.\n\n"\
+                                        description="Thanks for recognizing it <@{0}>! We'll make it easy on you.\n\n"\
                                             "Your countdown started. You will get tagged once you can re-gain the role.\n\n"\
                                             "\n\nTHE DELAY IS CURRENTLY OFF, YOU GET THE ROLE BACK.\n\n"\
                                             "This message will self-delete in 30 sec. Yours in 1 hour".format(msg.author.id), color=POST_COLOR)

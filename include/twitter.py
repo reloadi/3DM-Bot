@@ -16,18 +16,18 @@ discord_link = "discord.gg/fPmuqzQ"
 #              ]
 
 
-tag_phrase = ['Need #3dprinting help? Want to share your latest #3dprint? Join us:',
-                'Join our #3dprinting #3dprinter community and share with us:',
-                'Questions #3dprinting #3dprinter ? Join us:',
-                "Share your #3dprinting #3dprinter journey with us:",
-                "Need some #help or #support with your #3dprinter ? Join us:",
-                "#3dprinting is your hobby/drive you crazy? Join our discord: ",
-                "Become part of our great #Discord #3DPrinting #3DModeling community: ",
-                "Interested in #3Dprinting #3DPrinter ? join us on our discord server :"
+tag_phrase = ['Need #3dprinting help? Want to share your latest #3dprint? Join us',
+                'Join our #3dprinting #3dprinter community and share with us!',
+                'Questions on #3dprinting #3dprinter? We\'ll help!',
+                "Share your #3dprinting #3dprinter journey with us!",
+                "Need some #help or #support with your #3dprinter? Join us",
+                "#3dprinting is your hobby/drive you crazy? Join our discord!",
+                "Become part of our great #Discord #3DPrinting #3DModeling community!",
+                "Interested in #3Dprinting #3DPrinter? Join us on our discord server."
             ]
-tag_head = [ '#3dprint post by {0} on our discord:\nJoin us: {1}\n\n',
-             'Shared by {0} #3dprint on our discord:\nJoin us: {1}\n\n',
-             'Posted by {0} #3dprint on our discord:\nJoin us: {1}\n\n' ]
+tag_head = [ '#3dprint post by {0} on our discord.\nJoin us: {1}\n\n',
+             'Shared by {0} #3dprint on our discord.\nJoin us: {1}\n\n',
+             'Posted by {0} #3dprint on our discord.\nJoin us: {1}\n\n' ]
 
 class TweetDB():
     def __init__(self):
