@@ -107,8 +107,12 @@ async def checkImgPost(msg):
                 check = re.search('(http[^ ]+(:?jpg|png|jpeg))', post_url.lower())
                 if check and not 'unknown.png' in post_url.lower():
                     post_link = 'https://discordapp.com/channels/{2}/{0}/{1}'.format( msg.channel.id, msg.id, SERVER_ID )
-                    out_emb = discord.Embed(title="New image from: {0}".format(msg.author.display_name),
-                                            description="Sent in <#{0}> - _[original post]({2})_\n\n>>> `{1}`".format(msg.channel.id, msg.content, post_link), color=0xffffff)
+                    if msg.content:
+                        out_emb = discord.Embed(title="New image from: {0}".format(msg.author.display_name),
+                                                description="Sent in <#{0}> - _[original post]({2})_\n\n>>> `{1}`".format(msg.channel.id, msg.content, post_link), color=0xffffff)
+                    else:
+                        out_emb = discord.Embed(title="New image from: {0}".format(msg.author.display_name),
+                                                description="Sent in <#{0}> - _[original post]({1})_\n\n>>> Message has no content.".format(msg.channel.id, post_link), color=0xffffff)
                     try:
                         out_emb.set_thumbnail(url=post_url)
                     except:
