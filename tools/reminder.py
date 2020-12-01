@@ -4,20 +4,19 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 from datetime import datetime
 import dateutil.relativedelta
 
-end_contest = datetime.fromisoformat('2020-07-05 22:00:00.000')
+end_contest = datetime.fromisoformat('2020-09-30 23:59:00.000')
 dt2 = datetime.fromtimestamp(time.time())
 
 rd = dateutil.relativedelta.relativedelta (end_contest, dt2)
 
-DISCORD_IDEX = 1
-DESC_INDEX = 1
-
+DISCORD_IDEX = 0 #test: 2
+DESC_INDEX = 0
 DISCORD_HOOK   =[ [ 'https://discordapp.com/api/webhooks/673352384822378511/jJpS3G87pDvSZyUoFYhu5i24ZvoFB7eg7Sje_BoA4uqWoYPYu9eXIfAD3YanJ4IXffVy',
-                    'https://discordapp.com/api/webhooks/681991573390622752/Tp8j8ABuSSoktvp1WYotKgEcAccvJl9dN_Zh-1OTwkSExrQsBcTdlObvKY-UbbWd5pMl',
                     'https://discordapp.com/api/webhooks/673352065807941702/NhKZwFIC5JONfFZgNzmIQlX_JqUZND9WYJXIQatCJ-IXzWszp7rwb0-ysC6PPIUu_eiB',
-                    'https://discordapp.com/api/webhooks/681992174358757387/_VcPefyyZHt-KoYea4GSOJxExBMTkb-jdg_e6I5pGZ3D3Ya3SNDiS6gyVHHwulx-lnXB',
                     'https://discordapp.com/api/webhooks/681991884100468823/0aJCwepjMzplaDFKCt0UgoIGo0VPT25VfeVF1HDU_eYbiiuO_I7dN62WpPZaDXm1-z1P',
-                    'https://discordapp.com/api/webhooks/681992056389763093/baDkYEqFZRyxQN5HlDHLQhiklTSntkFDxPOOeBlrDN6b3v_DRGIflBYrJFKWt3Hqa2ng'
+                    'https://discordapp.com/api/webhooks/681991573390622752/Tp8j8ABuSSoktvp1WYotKgEcAccvJl9dN_Zh-1OTwkSExrQsBcTdlObvKY-UbbWd5pMl', #showoff
+                    'https://discordapp.com/api/webhooks/681992174358757387/_VcPefyyZHt-KoYea4GSOJxExBMTkb-jdg_e6I5pGZ3D3Ya3SNDiS6gyVHHwulx-lnXB', # support-3
+                    'https://discordapp.com/api/webhooks/681992056389763093/baDkYEqFZRyxQN5HlDHLQhiklTSntkFDxPOOeBlrDN6b3v_DRGIflBYrJFKWt3Hqa2ng'  # support-2
                   ],
                   [ 'https://discordapp.com/api/webhooks/673352384822378511/jJpS3G87pDvSZyUoFYhu5i24ZvoFB7eg7Sje_BoA4uqWoYPYu9eXIfAD3YanJ4IXffVy', # 3dprint, community and support1
                     'https://discordapp.com/api/webhooks/673352065807941702/NhKZwFIC5JONfFZgNzmIQlX_JqUZND9WYJXIQatCJ-IXzWszp7rwb0-ysC6PPIUu_eiB',
@@ -30,19 +29,19 @@ DISCORD_HOOK   =[ [ 'https://discordapp.com/api/webhooks/673352384822378511/jJpS
                   ] ]
 
 
-rule = 'https://discordapp.com/channels/637075986726518794/651199972221517824/719599252166279288'
-post = [ 'https://media.discordapp.net/attachments/719616999902150737/727532843839914034/20200630_012308.jpg',
-            'https://cdn.discordapp.com/attachments/719616999902150737/727390157539508294/20200630_005018.jpg',
-            'https://cdn.discordapp.com/attachments/719616999902150737/725599175009370202/IMG_5289.JPG',
-            'https://cdn.discordapp.com/attachments/719616999902150737/727359082453008414/IMG_20200629_204725.jpg',
-            'https://cdn.discordapp.com/attachments/719616999902150737/724664420525146243/IMG_20200622_063247.jpg',
-            'https://media.discordapp.net/attachments/719616999902150737/723521342179115148/DSC01608.JPG',
-            'https://cdn.discordapp.com/attachments/719616999902150737/727648952077254766/image3.jpg',
-            'https://cdn.discordapp.com/attachments/674431530562748419/722868663027499028/image0.jpg',
-            'https://media.discordapp.net/attachments/719616999902150737/724650780912779264/c6fc0980-ed14-48d1-8850-b62e29729b25.png',
-            'https://cdn.discordapp.com/attachments/719616999902150737/726797262549942273/DSC01067.jpg'
+rule = 'https://discordapp.com/channels/637075986726518794/651199972221517824/755186852750950421'
+post = [ 'https://cdn.discordapp.com/attachments/637075986726518796/759941463940923422/unknown.png',
+            'https://cdn.discordapp.com/attachments/755183696176480306/757736934180388915/image0.jpg',
+            'https://cdn.discordapp.com/attachments/755183696176480306/757736934448824350/image1.jpg',
+            'https://cdn.discordapp.com/attachments/755183696176480306/757736934931169310/image3.jpg',
+            'https://cdn.discordapp.com/attachments/755183696176480306/758876516578361375/0924202213.jpg',
+            'https://cdn.discordapp.com/attachments/755183696176480306/758876637919051816/0924201834f.jpg',
+            'https://cdn.discordapp.com/attachments/755183696176480306/759468887225270272/20200925_222548.jpg',
+            'https://cdn.discordapp.com/attachments/755183696176480306/759468910994522136/20200925_171138.jpg',
+            'https://cdn.discordapp.com/attachments/755183696176480306/759894989177880595/IMG_3005.jpg',
+            'https://cdn.discordapp.com/attachments/755183696176480306/759894994831015936/D826012-sRGB_4096.JPG'
 ]
-post_link = 'https://discordapp.com/channels/637075986726518794/719616999902150737/722868805411274824'
+post_link = 'https://discordapp.com/channels/637075986726518794/755183696176480306/755705401613221908'
 vote_link = 'https://discordapp.com/channels/637075986726518794/727872214371926076/727873608491204678'
 left = "{0} days and {1} hours".format(rd.days, rd.hours)
 
@@ -64,4 +63,3 @@ for h in DISCORD_HOOK[DISCORD_IDEX]:
     webhook.execute()
     webhook.remove_embed(0)
     time.sleep(1)
-

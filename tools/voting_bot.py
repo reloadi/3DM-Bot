@@ -4,17 +4,15 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 from datetime import datetime
 import dateutil.relativedelta
 
-DISCORD_HOOK  = 'https://discordapp.com/api/webhooks/717043301852905562/JtkMAun4Mjn6jHWCcMz-eZf2sRbLK7ZWFsxFEp-9grxlNidpzBW87QV0xMi9mVsTacMa'
+DISCORD_HOOK  = 'https://discordapp.com/api/webhooks/773354048899383338/fww2kibytobkRzjoXRfHipKpvX5OLM4vOIQVQxScbDQtkEo9CuWrKSmL6mSjW_fbSI7l'
 webhook       = DiscordWebhook(url=DISCORD_HOOK)
 
-post = [  [ "bruh", "https://discordapp.com/channels/637075986726518794/708483892679802922/710719015898710096", "https://cdn.discordapp.com/attachments/674431530562748419/710718630521864292/image0.jpg" ],
-          [ "Derik", "https://discordapp.com/channels/637075986726518794/708483892679802922/713915116139053136", "https://cdn.discordapp.com/attachments/708483892679802922/713915345836179466/image0.jpg" ],
-          [ "VincentWRX", "https://discordapp.com/channels/637075986726518794/708483892679802922/715078726798540827", "https://cdn.discordapp.com/attachments/708483892679802922/715078748642213928/DSC_1328.JPG" ],
-          [ "Puro 😾", "https://discordapp.com/channels/637075986726518794/708483892679802922/715707754337271819", "https://cdn.discordapp.com/attachments/708483892679802922/715708001800945665/20200528_191108.jpg" ],
-          [ "depark88", "https://discordapp.com/channels/637075986726518794/708483892679802922/716455871051464716", "https://cdn.discordapp.com/attachments/708483892679802922/716455902118543490/4.jpg" ],
-          [ "nsfbr", "https://discordapp.com/channels/637075986726518794/708483892679802922/716774680412815482", "https://cdn.discordapp.com/attachments/708483892679802922/716774829008617542/D825976-sRGB_4096.JPG" ],
-          [ "Cdub3D", "https://discordapp.com/channels/637075986726518794/708483892679802922/716798257392517190", "https://cdn.discordapp.com/attachments/708483892679802922/716798358584557628/IMG_7162.JPG" ],
-          [ "hetile❄", "https://discordapp.com/channels/637075986726518794/708483892679802922/716811636278820936", "https://cdn.discordapp.com/attachments/708483892679802922/716811697863655444/20200531_201141.jpg" ]
+post = [  [ "Puro", "https://discordapp.com/channels/637075986726518794/762872025210421268/767187014709280778", "https://cdn.discordapp.com/attachments/762872025210421268/767189127941849108/DSC01416.JPG" ],
+          [ "Howling Wolf", "https://discordapp.com/channels/637075986726518794/762872025210421268/771559295770296350", "https://cdn.discordapp.com/attachments/762872025210421268/771559357808640030/20201029_193425.jpg" ],
+          [ "vaportrail", "https://discordapp.com/channels/637075986726518794/762872025210421268/771618605698908160", "https://cdn.discordapp.com/attachments/762872025210421268/771618824810266624/20201029_183222.jpg" ],
+          [ "Lewis", "https://discordapp.com/channels/637075986726518794/762872025210421268/771701132387942411", "https://cdn.discordapp.com/attachments/762872025210421268/771701617539416094/20201030_114552.jpg" ],
+          [ "DIY Jaad", "https://discordapp.com/channels/637075986726518794/762872025210421268/771858996940111892", "https://cdn.discordapp.com/attachments/637099044165910528/771828747204165652/PXL_20201030_200803374.jpg" ],
+          [ "hughie1987", "https://discordapp.com/channels/637075986726518794/762872025210421268/772165574926139402", "https://cdn.discordapp.com/attachments/762872025210421268/772165562695549009/20201031_142652.jpg" ]
        ]
 
 embed = DiscordEmbed(title="3DMeltdown - Voting", color=0xa21d1d)
