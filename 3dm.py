@@ -51,8 +51,9 @@ COUNT_CHANNEL   = 732365559647174736
 
 t = MyTwitter()
 
-bot = discord.Client()
-#bot = discord.ext.commands.Bot(command_prefix='/', case_insensitive=True)
+intents = discord.Intents().all()
+#bot = discord.Client()
+bot = discord.ext.commands.Bot(command_prefix='', case_insensitive=True, intents=intents)
 #bot.add_cog(DiceCog(bot))
 
 # fix some different way to type currency
@@ -106,8 +107,12 @@ async def checkImgPost(msg):
                 check = re.search('(http[^ ]+(:?jpg|png|jpeg))', post_url.lower())
                 if check and not 'unknown.png' in post_url.lower():
                     post_link = 'https://discordapp.com/channels/{2}/{0}/{1}'.format( msg.channel.id, msg.id, SERVER_ID )
-                    out_emb = discord.Embed(title="New image from: {0}".format(msg.author.display_name),
-                                            description="Sent in <#{0}> - _[original post]({2})_\n\n>>> `{1}`".format(msg.channel.id, msg.content, post_link), color=0xffffff)
+                    if msg.content:
+                        out_emb = discord.Embed(title="New image from: {0}".format(msg.author.display_name),
+                                                description="Sent in <#{0}> - _[original post]({2})_\n\n>>> `{1}`".format(msg.channel.id, msg.content, post_link), color=0xffffff)
+                    else:
+                        out_emb = discord.Embed(title="New image from: {0}".format(msg.author.display_name),
+                                                description="Sent in <#{0}> - _[original post]({1})_\n\n>>> Message has no content.".format(msg.channel.id, post_link), color=0xffffff)
                     try:
                         out_emb.set_thumbnail(url=post_url)
                     except:
@@ -222,12 +227,14 @@ async def on_command_error(ctx, error):
 async def on_raw_reaction_add(payload):
     if payload.user_id == bot.user.id:
         return
-    guild   = bot.get_guild(payload.guild_id)
-    member  = guild.get_member(payload.user_id)
 
     # monitor the image log channel, if someone hit a reaction, remove it from channel
     if payload.channel_id in [TRACKING_IMG, JOIN_CHANNEL] and payload.emoji.name in [DELETE_EMOJI]:
+        guild   = bot.get_guild(payload.guild_id)
+        member  = guild.get_member(int(payload.user_id))
+
         cross_post = bot.get_channel(payload.channel_id)
+        #__debug(payload, True)
         image_post = await cross_post.fetch_message(payload.message_id)
         # check if member is allowed
         if t.allowed(member.roles):
@@ -254,11 +261,6 @@ async def on_message(msg):
         # If the message is in the join-issue channel
         if msg.channel.id == JOIN_CHANNEL:
             await noob(msg)
-            return
-
-        if msg.channel.id == COUNT_CHANNEL:
-            __debug(msg)
-            await count_control(msg)
             return
 
         # check if it's a image for the image log (for twitter posts)
